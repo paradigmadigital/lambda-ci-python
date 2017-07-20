@@ -6,3 +6,4 @@ config.json
 examples.ipynb
 *.retry
 dist
+.directory
