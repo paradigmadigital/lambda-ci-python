@@ -1,0 +1,29 @@
+node{
+    stage("Commit Stage") {
+        git([url: "https://github.com/avara1986/aws-lambda-python-ci.git", branch: "master"])
+    }
+    stage("Build Stage") {
+        withCredentials([usernamePassword(credentialsId: "aws", passwordVariable: "AWS_SECRET_ACCESS_KEY", usernameVariable: "AWS_ACCESS_KEY_ID")]) {
+            sh "aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}"
+            sh "aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}"
+            sh "aws configure set region eu-west-1"
+            sh "aws configure set output json"
+        }
+        env.WORKSPACE = pwd()
+        sh "virtualenv --python=/usr/local/bin/python3.6 venv"
+        env.PATH="${env.WORKSPACE}/venv/bin:/usr/bin:${env.PATH}"
+        sh "pip install -r requirements-test.txt"
+    }
+    stage("Test Stage") {
+        sh script: "./tests.sh"
+    }
+    stage("Deploy Stage") {
+        withCredentials([usernamePassword(credentialsId: "aws", passwordVariable: "AWS_SECRET_ACCESS_KEY", usernameVariable: "AWS_ACCESS_KEY_ID")]) {
+            sh "ardy -p myexamplelambdaproject deploy"
+        }
+        
+    }
+    stage("Coverage&amp;Sonar Stage") {
+        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "htmlcov", reportFiles: "index.html", reportName: "HTML Report"])
+    }
+}

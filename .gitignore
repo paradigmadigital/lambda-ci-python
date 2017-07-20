@@ -1,0 +1,8 @@
+venv
+.ipynb_checkpoints
+.vagrant
+.idea
+config.json
+examples.ipynb
+*.retry
+dist

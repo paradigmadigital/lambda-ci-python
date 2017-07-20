@@ -1,0 +1,104 @@
+---
+# This playbook deploys the whole application stack in this site.
+
+- name: Install basic software
+  hosts: jenkins-slave
+  tasks:
+    - name: install Git and gcc
+      become: true
+      become_method: sudo
+      yum: name={{ item }}
+           state=latest
+      with_items:
+        - git
+        - gcc
+        - zlib-devel
+        - libffi-devel
+        - python-devel
+        - openssl-devel
+
+- name: Install python 3.6
+  hosts: jenkins-slave
+  tasks:
+    - name: Get Python 3.6
+      get_url:
+        url: https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+        dest: /tmp/
+
+    - name: Unarchive Python 3.6
+      become: true
+      become_method: sudo
+      unarchive:
+        src: /tmp/Python-3.6.1.tgz
+        dest: /usr/src/
+        remote_src: True
+
+    - name: Install python 3.6
+      become: true
+      become_method: sudo
+      command: "{{ item }}"
+      with_items:
+        - ./configure --enable-optimizations
+        - make altinstall
+      args:
+        chdir: /usr/src/Python-3.6.1/
+- name: Install python dependencies
+  hosts: jenkins-slave
+  tasks:
+    - name: Download pip
+      get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /tmp/
+
+    - name: Install pip
+      become: true
+      become_method: sudo
+      command: python /tmp/get-pip.py
+      
+    - name: Install AWS Cli & virtualenv
+      become: true
+      become_method: sudo
+      command: pip install {{ item }}
+      with_items:
+        - virtualenv
+        - awscli
+
+- name: Install jenkins dependencies
+  hosts: jenkins-slave
+  tasks:
+    - name: install jdk rpm
+      become: true
+      become_method: sudo
+      yum: name={{ item }}
+           state=latest
+      with_items:
+        - java-1.8.0-openjdk
+        - wget
+        
+    - name: add Jenkins to yum
+      become: true
+      become_method: sudo
+      shell: "wget -O /etc/yum.repos.d/jenkins.repo http://jenkins-ci.org/redhat/jenkins.repo"
+
+    - name: add jenkins key
+      become: true
+      become_method: sudo
+      shell: "rpm --import http://pkg.jenkins-ci.org/redhat/jenkins-ci.org.key"
+
+    - name: install jenkins rpm
+      become: true
+      become_method: sudo
+      yum: name=jenkins
+           state=latest
+           
+- name: start Jenkins
+  hosts: jenkins-slave
+  tasks:
+  - name: start Jenkins
+    become: true
+    become_method: sudo
+    shell: "service jenkins start"
+    
+    
+
+    
