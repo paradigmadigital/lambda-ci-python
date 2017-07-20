@@ -4,6 +4,8 @@
 
 Create virtual environment and install requirements:
 
+.. code-block:: bash
+
     $ which python3.6
     /usr/local/bin/python3.6
     $ virtualenv --python $(which python3.6) venv
@@ -13,6 +15,7 @@ Create virtual environment and install requirements:
 
 Configure a AWS account:
 
+.. code-block:: bash
 
     $ mkdir ~/.aws
     $ cat >> ~/.aws/config
@@ -23,11 +26,15 @@ Configure a AWS account:
 
   
 Install Jupyter plugins
-    
+
+.. code-block:: bash
+
     $ jupyter-nbextension install rise --py --sys-prefix
     $ jupyter-nbextension enable rise --py --sys-prefix
     
 
 Run Jupyter
-    
+
+.. code-block:: bash
+
     $ jupyter notebook
