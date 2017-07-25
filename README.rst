@@ -1,6 +1,8 @@
-# AWS Lambda with Python and CI
+AWS Lambda with Python and CI
+-----------------------------
 
-## Installation
+Installation
+============
 
 Create virtual environment and install requirements:
 
