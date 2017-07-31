@@ -3,7 +3,6 @@ venv
 .vagrant
 .idea
 config.json
-examples.ipynb
 *.retry
 dist
 .directory
